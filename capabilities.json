@@ -1,0 +1,160 @@
+{
+  "student": "Gaddam Raja Kumar",
+  "repository": "https://github.com/grk0519/inboxhero",
+  "system": {
+    "model": "gpt-4o-mini",
+    "rule_handled": 40,
+    "owner": "sam@paperjet.io",
+    "note": "Set to the model actually used in demos; rule_handled reflects the number of inbox items handled by the rule path during a real R1 run."
+  },
+  "capabilities": [
+    {
+      "id": "R1",
+      "name": "Zero the inbox",
+      "tier": "B",
+      "claim": "every message gets one disposition + reason, none left",
+      "command": "python demo.py --cap R1",
+      "observable": "All 100 messages receive exactly one disposition and one reason; no message remains unclassified.",
+      "evidence": {
+        "message_count": 100,
+        "thread_count": 88,
+        "rule_handled": 40,
+        "resolved_messages": 100,
+        "source": "inbox.json"
+      },
+      "related_ids": []
+    },
+    {
+      "id": "R2",
+      "name": "Grounded reply",
+      "tier": "B",
+      "claim": "drafts cite the earlier message they used (m008 ← m003)",
+      "command": "python demo.py --cap R2",
+      "observable": "The drafted reply to m008 grounds its content in the earlier m003 message and cites the relevant facts.",
+      "evidence": {
+        "thread_id": "t-api",
+        "source_message": "m003",
+        "target_message": "m008",
+        "grounding": "m008 ← m003"
+      },
+      "related_ids": ["m003", "m008"]
+    },
+    {
+      "id": "R3",
+      "name": "Gate the irreversible",
+      "tier": "C",
+      "claim": "no send/delete without approval or --dry-run",
+      "command": "python demo.py --cap R3",
+      "observable": "Any irreversible action is blocked unless approval is granted or the dry-run flag is active.",
+      "evidence": {
+        "blocked_actions": ["send", "delete"],
+        "guard": "require_approval()",
+        "dry_run_supported": true,
+        "approval_required": true
+      },
+      "related_ids": []
+    },
+    {
+      "id": "R4",
+      "name": "Persistent preference",
+      "tier": "C",
+      "claim": "m015 / m041 survive a restart and change later mail",
+      "command": "python demo.py --cap R4",
+      "observable": "The preference extracted from m015 and the owner note in m041 persist on disk and affect later mail after a restart.",
+      "evidence": {
+        "preference_messages": ["m015", "m041"],
+        "persistence": "JSON file on disk",
+        "effect": "Later messages are handled according to saved preference rules"
+      },
+      "related_ids": ["m015", "m041"]
+    },
+    {
+      "id": "R5",
+      "name": "Refuse embedded instructions",
+      "tier": "C",
+      "claim": "m024, m017, m039, m047 refused, flagged, reported",
+      "command": "python demo.py --cap R5",
+      "observable": "Embedded-instruction and phishing-style messages are refused, flagged, and logged instead of followed.",
+      "evidence": {
+        "refused_messages": ["m024", "m017", "m039", "m047"],
+        "actions": ["refuse", "flag", "report"],
+        "handled_as_data": true
+      },
+      "related_ids": ["m017", "m024", "m039", "m047"]
+    },
+    {
+      "id": "R6",
+      "name": "Dashboard",
+      "tier": "C",
+      "claim": "three panes; [m038, m040] cited; m010 vs m061 conflict",
+      "command": "python demo.py --cap R6",
+      "observable": "The final dashboard renders the three panes, cites m038 and m040 as supporting evidence, and surfaces the m010 vs m061 conflict in the summary.",
+      "evidence": {
+        "pane_count": 3,
+        "cited_messages": ["m038", "m040"],
+        "conflict": {
+          "message_a": "m010",
+          "message_b": "m061",
+          "reason": "same-day scheduling conflict: availability conflict with interview and dental visit"
+        }
+      },
+      "related_ids": ["m010", "m038", "m040", "m061"]
+    },
+    {
+      "id": "X1",
+      "name": "Unread from sender",
+      "tier": "A",
+      "claim": "one lookup, unread mail from a given address",
+      "command": "python demo.py --cap X1 --from aria.f@northwind.vc",
+      "observable": "A single lookup returns the unread message(s) from the requested sender address.",
+      "evidence": {
+        "query_sender": "aria.f@northwind.vc",
+        "matching_unread_messages": ["m010"],
+        "result_count": 1
+      },
+      "related_ids": ["m010"]
+    },
+    {
+      "id": "X2",
+      "name": "Follow-up tracking",
+      "tier": "B",
+      "claim": "unanswered owner-sent mail (m044), with a chase draft",
+      "command": "python demo.py --cap X2",
+      "observable": "Unanswered owner-sent mail is tracked and followed up with a chase draft when the thread is still open.",
+      "evidence": {
+        "owner_sent_message": "m044",
+        "status": "unanswered",
+        "follow_up_type": "chase draft"
+      },
+      "related_ids": ["m044"]
+    },
+    {
+      "id": "X3",
+      "name": "Morning digest",
+      "tier": "B",
+      "claim": "needs you / can wait / auto-archived",
+      "command": "python demo.py --cap X3",
+      "observable": "The digest groups messages into needs-you, can-wait, and auto-archived buckets.",
+      "evidence": {
+        "buckets": ["needs you", "can wait", "auto-archived"],
+        "example_messages": ["m010", "m061"],
+        "auto_archive_examples": ["newsletter", "receipt", "system notice"]
+      },
+      "related_ids": ["m010", "m061"]
+    },
+    {
+      "id": "X4",
+      "name": "Thread open question",
+      "tier": "B",
+      "claim": "t-launch reduced to the pricing-copy ask in m030",
+      "command": "python demo.py --cap X4",
+      "observable": "The t-launch thread is narrowed to the single actionable pricing-copy question in m030, excluding unrelated work.",
+      "evidence": {
+        "thread_id": "t-launch",
+        "reduced_to_message": "m030",
+        "focus": "annual discount wording on the pricing page"
+      },
+      "related_ids": ["m030"]
+    }
+  ]
+}

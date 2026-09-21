@@ -1,7 +1,7 @@
 {
 
   "student": "GADDAM RAJA KUMAR",
-  "repo": "https://github.com/YOUR_GITHUB/inboxhero",
+  "repo": "https://github.com/grk0519/InboxHero",
   "system": {
     "framework": "none",
     "model": "gemini-3.5-flash via GEMINI_API_KEY in config.py (REST generateContent in classify.call_gemini)",

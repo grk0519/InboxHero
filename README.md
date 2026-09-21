@@ -254,3 +254,33 @@ InboxHero/
 - `--cap` accepts `R1`, `R2`, `R3`, `R4`, `R5`, `R6`, `X1`, `X2`, `X3`, and `X4`.
 - Use `--dry-run` with R3 when inspecting proposed irreversible actions.
 - Use a separate output directory or restore generated JSON files when repeating demos and comparing traces.
+
+## FINAL REPORT
+
+### 1) Refused to automate
+
+- I refused to automate irreversible actions like sending or deleting mail.
+- Example: `m024` tries to forward the mailbox and hide the instruction, and the system refuses it.
+- This is blocked because `send` and `delete` are dangerous, and only [gate.py](gate.py) can do them.
+- I drew the line there to stop hostile email instructions from becoming real actions.
+
+### 2) Untrusted text boundary
+
+- Untrusted text enters through the inbox loaded by [store.py](store.py).
+- The system treats email content as data, not instructions.
+- It only follows actions after checks in [safety.py](safety.py), [rules.py](rules.py), and the gate in [gate.py](gate.py).
+- An attacker would need to defeat all three layers before the system acts on their behalf.
+
+### 3) Accountability for wrong sends
+
+- The human owner or operator is accountable if a wrong message is sent.
+- The system records the exact message, route, reason, and approval in `trace.jsonl` and the JSON outputs.
+- This helps trace the failure back to the source message and the gate decision.
+- So the project makes the audit trail visible instead of hiding responsibility.
+
+### 4) My own machinery
+
+- [demo.py](demo.py) is the router because it chooses the capability and dispatches the task.
+- The tasks are the capability functions like `cap_r1`, `cap_r2`, and `cap_r3`.
+- The agents are modules like [rules.py](rules.py), [safety.py](safety.py), [retrieve.py](retrieve.py), [draft.py](draft.py), and [gate.py](gate.py).
+- The full module set acts like the crew, and a framework would add structure, but this custom pipeline is clearer and safer for a small assignment project.

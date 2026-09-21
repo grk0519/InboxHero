@@ -1,3 +1,5 @@
+# Git Repo: 
+    https://github.com/grk0519/InboxHero
 # InboxHero
 
 InboxHero is a local Python inbox-triage demo. It loads mailbox data from `inbox.json`, applies deterministic safety and routing rules, optionally uses Gemini for messages that rules cannot classify, drafts grounded replies, gates irreversible actions, and writes traceable JSON and HTML output.
